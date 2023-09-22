@@ -18,7 +18,6 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@/api": ["src/*"],
       "@/api/controllers": ["src/controllers"],
       "@/api/entities": ["src/entities"],
       "@/api/guards": ["src/guards"],
