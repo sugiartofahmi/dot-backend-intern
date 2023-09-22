@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+        with:
+          node-version: 18
+      - run: bun install
+      - run: bun run lint
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+        with:
+          node-version: 18
+      - run: bun install
+      - run: bun prisma generate
+      - run: bun run build
