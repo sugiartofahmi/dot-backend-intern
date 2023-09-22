@@ -8,4 +8,4 @@ export const VSRegister = z
   })
   .required();
 
-export type TVSRegister = z.infer<typeof VSRegister>;
+export type RegisterDto = z.infer<typeof VSRegister>;
