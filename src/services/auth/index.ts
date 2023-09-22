@@ -1,20 +1,36 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '@/api/services';
+import { encryptPassword } from '@/api/utils';
 import { TRegisterRequest, TRegisterResponse } from '@/api/entities';
 @Injectable()
 export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
   async register(payload: TRegisterRequest): Promise<TRegisterResponse> {
     const { email, password, fullname } = payload;
-    const user = await this.prisma.users.create({
+
+    const isUserExist = await this.prisma.users.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (isUserExist) {
+      throw new ConflictException('User already exists');
+    }
+
+    const hashPassword = await encryptPassword(password);
+    const createUser = await this.prisma.users.create({
       data: {
         email,
-        password,
+        password: hashPassword,
         fullname,
       },
     });
-    if (!user) {
-      throw new BadRequestException('User already exists');
+    if (!createUser) {
+      throw new BadRequestException('Register failed');
     }
 
     return {
