@@ -17,3 +17,14 @@ export type TLoginResponse = {
   access_token: string;
   refresh_token: string;
 };
+
+export type TTokenRequest = {
+  sub: string;
+  email: string;
+  fullname: string;
+};
+
+export type TTokenResponse = {
+  access_token: string;
+  refresh_token: string;
+};
