@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '@/api/services';
+import { PrismaService } from '@api/services';
 import {
   TProfileRequest,
   TProfileResponse,
   TUsersResponse,
-} from '@/api/entities';
+} from '@api/entities';
 
 @Injectable()
 export class UserService {

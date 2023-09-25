@@ -1,5 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
-import { TTokenRequest, TTokenResponse } from '@/api/entities';
+import { TTokenRequest, TTokenResponse } from '@api/entities';
 
 const jwt = new JwtService();
 
