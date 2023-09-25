@@ -1,7 +1,6 @@
 import { Controller, Post, Get, Patch, Body, Delete } from '@nestjs/common';
-import { BookService } from '@/api/services';
-import { ZodValidationPipe } from '@/api/pipes';
-import { VSRegister, RegisterDto, LoginDto, VSLogin } from '@/api/entities';
+import { BookService } from '@api/services';
+
 @Controller('book')
 export class BookController {
   constructor(private readonly bookService: BookService) {}

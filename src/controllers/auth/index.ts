@@ -1,7 +1,7 @@
 import { Controller, Post, UsePipes, Body } from '@nestjs/common';
-import { AuthService } from '@/api/services';
-import { ZodValidationPipe } from '@/api/pipes';
-import { VSRegister, RegisterDto, LoginDto, VSLogin } from '@/api/entities';
+import { AuthService } from '@api/services';
+import { ZodValidationPipe } from '@api/pipes';
+import { VSRegister, RegisterDto, LoginDto, VSLogin } from '@api/entities';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

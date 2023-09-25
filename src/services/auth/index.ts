@@ -4,15 +4,15 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '@/api/services';
-import { comparePassword, encryptPassword } from '@/api/utils';
+import { PrismaService } from '@api/services';
+import { comparePassword, encryptPassword } from '@api/utils';
 import {
   TLoginRequest,
   TLoginResponse,
   TRegisterRequest,
   TRegisterResponse,
-} from '@/api/entities';
-import { generateToken } from '@/api/utils';
+} from '@api/entities';
+import { generateToken } from '@api/utils';
 
 @Injectable()
 export class AuthService {

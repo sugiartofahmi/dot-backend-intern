@@ -4,7 +4,7 @@ import { UserModule } from '../user';
 import { BookModule } from '../book';
 
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy, RtStrategy } from '@/api/strategies';
+import { JwtStrategy, RtStrategy } from '@api/strategies';
 @Module({
   imports: [
     AuthModule,

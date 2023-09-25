@@ -18,15 +18,15 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@/api/controllers": ["src/controllers"],
-      "@/api/entities": ["src/entities"],
-      "@/api/guards": ["src/guards"],
-      "@/api/models": ["src/models"],
-      "@/api/modules": ["src/modules"],
-      "@/api/pipes": ["src/pipes"],
-      "@/api/services": ["src/services"],
-      "@/api/strategies": ["src/strategies"],
-      "@/api/utils": ["src/utils"]
+      "@api/controllers": ["src/controllers"],
+      "@api/entities": ["src/entities"],
+      "@api/guards": ["src/guards"],
+      "@api/models": ["src/models"],
+      "@api/modules": ["src/modules"],
+      "@api/pipes": ["src/pipes"],
+      "@api/services": ["src/services"],
+      "@api/strategies": ["src/strategies"],
+      "@api/utils": ["src/utils"]
     }
   }
 }
