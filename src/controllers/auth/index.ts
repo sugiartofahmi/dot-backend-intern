@@ -1,7 +1,22 @@
-import { Controller, Post, UsePipes, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UsePipes,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from '@api/services';
 import { ZodValidationPipe } from '@api/pipes';
-import { VSRegister, RegisterDto, LoginDto, VSLogin } from '@api/entities';
+import {
+  VSRegister,
+  RegisterDto,
+  LoginDto,
+  VSLogin,
+  TReqToken,
+} from '@api/entities';
+import { RtGuard } from '@api/guards';
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -16,5 +31,11 @@ export class AuthController {
   @UsePipes(new ZodValidationPipe(VSLogin))
   async login(@Body() payload: LoginDto) {
     return await this.authService.login(payload);
+  }
+
+  @Post('refresh')
+  @UseGuards(RtGuard)
+  async refresh(@Request() { user: { email, sub, role } }: TReqToken) {
+    return await this.authService.refresh({ email, sub, role });
   }
 }

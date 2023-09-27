@@ -9,10 +9,12 @@ import { comparePassword, encryptPassword } from '@api/utils';
 import {
   TLoginRequest,
   TLoginResponse,
+  TRefreshToken,
   TRegisterRequest,
   TRegisterResponse,
+  TTokenRequest,
 } from '@api/entities';
-import { generateToken } from '@api/utils';
+import { generateToken, generateAccessToken } from '@api/utils';
 
 @Injectable()
 export class AuthService {
@@ -52,6 +54,17 @@ export class AuthService {
       where: {
         email,
       },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        role: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
     if (!isUserExist) {
       throw new NotFoundException('User not found');
@@ -63,14 +76,31 @@ export class AuthService {
     const { access_token, refresh_token } = await generateToken({
       sub: isUserExist.id,
       email: isUserExist.email,
-      fullname: isUserExist.fullname,
+      role: isUserExist.role?.name,
     });
     if (!isPasswordMatch) {
       throw new BadRequestException('Password is wrong');
     }
+    const expiresIn = 15 * 60 * 1000;
+    const now = Date.now();
+    const expirationTime = now + expiresIn;
+
     return {
+      expired_at: expirationTime,
       access_token,
       refresh_token,
+    };
+  }
+  async refresh(payload: TTokenRequest): Promise<TRefreshToken> {
+    const expiresIn = 15 * 60 * 1000;
+    const access_token = await generateAccessToken(payload);
+
+    const now = Date.now();
+    const expirationTime = now + expiresIn;
+
+    return {
+      access_token,
+      expired_at: expirationTime,
     };
   }
 }

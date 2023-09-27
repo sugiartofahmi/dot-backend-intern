@@ -10,6 +10,8 @@ import {
   TBookCreateRequest,
   TBooksResponse,
   TBookCreateResponse,
+  TBookUpdateRequest,
+  TBooksRequest,
 } from '@api/entities';
 
 @Injectable()
@@ -17,7 +19,7 @@ export class BookService {
   constructor(private readonly prisma: PrismaService) {}
   async getBookById(payload: TBookByIdRequest): Promise<TBookResponse> {
     const book = await this.prisma.books.findUnique({
-      where: { id: payload.id },
+      where: { id: payload.id, author_id: payload.author_id },
       select: {
         title: true,
         created_at: true,
@@ -37,8 +39,16 @@ export class BookService {
       author: book.author.fullname,
     };
   }
-  async getBooks(): Promise<TBooksResponse[]> {
+  async getAllBooks({
+    author_id,
+    role,
+  }: TBooksRequest): Promise<TBooksResponse[]> {
     const books = await this.prisma.books.findMany({
+      where: {
+        ...(role === 'user' && {
+          author_id,
+        }),
+      },
       select: {
         title: true,
         created_at: true,
@@ -58,7 +68,7 @@ export class BookService {
   async createBook(payload: TBookCreateRequest): Promise<TBookCreateResponse> {
     const book = await this.prisma.users.update({
       where: {
-        email: payload.author_email,
+        email: payload.author_id,
       },
       data: {
         books: {
@@ -84,7 +94,7 @@ export class BookService {
       message: 'Book created',
     };
   }
-  async updateBook(payload: TBookByIdRequest): Promise<TBookResponse> {
+  async updateBook(payload: TBookUpdateRequest): Promise<TBookResponse> {
     const book = await this.prisma.books.update({
       where: { id: payload.id },
       data: payload,
