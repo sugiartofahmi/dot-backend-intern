@@ -6,11 +6,23 @@ export type TBookResponse = {
 
 export type TBookByIdRequest = {
   id: string;
+  author_id: string;
+};
+
+export type TBookUpdateRequest = {
+  id: string;
+  title?: string;
+  author_id: string;
 };
 
 export type TBookCreateRequest = {
   title: string;
-  author_email: string;
+  author_id: string;
+};
+
+export type TBooksRequest = {
+  author_id: string;
+  role: string;
 };
 
 export type TBooksResponse = {

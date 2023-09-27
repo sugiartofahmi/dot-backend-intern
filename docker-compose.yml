@@ -10,3 +10,26 @@ services:
       POSTGRES_DB: dot-db
     ports:
       - '5435:5435'
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    networks:
+      - default
+  api:
+    container_name: dot-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    ports:
+      - '3000:3000'
+    depends_on:
+      - database
+    volumes:
+      - ./app:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - default

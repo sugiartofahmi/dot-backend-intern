@@ -12,6 +12,8 @@ model Users {
   email      String   @unique
   fullname   String
   password   String
+  role_id    Int      @default(1)
+  role       Roles    @relation(fields: [role_id], references: [id])
   created_at DateTime @default(now())
   books      Books[]
 }
@@ -20,6 +22,13 @@ model Books {
   id         String   @id @default(uuid())
   title      String
   created_at DateTime @default(now())
-  author     Users    @relation(fields: [author_id], references: [id])
+  author     Users    @relation(fields: [author_id], references: [id], onDelete: Cascade)
   author_id  String
+}
+
+model Roles {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  created_at DateTime @default(now())
+  users      Users[]
 }
