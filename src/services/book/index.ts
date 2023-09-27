@@ -21,6 +21,7 @@ export class BookService {
     const book = await this.prisma.books.findUnique({
       where: { id: payload.id, author_id: payload.author_id },
       select: {
+        id: true,
         title: true,
         created_at: true,
         author: {
@@ -50,6 +51,7 @@ export class BookService {
         }),
       },
       select: {
+        id: true,
         title: true,
         created_at: true,
         author: {
@@ -68,21 +70,12 @@ export class BookService {
   async createBook(payload: TBookCreateRequest): Promise<TBookCreateResponse> {
     const book = await this.prisma.users.update({
       where: {
-        email: payload.author_id,
+        id: payload.author_id,
       },
       data: {
         books: {
           create: {
             title: payload.title,
-          },
-        },
-      },
-      select: {
-        fullname: true,
-        books: {
-          select: {
-            title: true,
-            created_at: true,
           },
         },
       },
@@ -99,6 +92,7 @@ export class BookService {
       where: { id: payload.id },
       data: payload,
       select: {
+        id: true,
         title: true,
         created_at: true,
         author: {
@@ -121,6 +115,7 @@ export class BookService {
     const book = await this.prisma.books.delete({
       where: { id: payload.id },
       select: {
+        id: true,
         title: true,
         created_at: true,
         author: {
