@@ -19,7 +19,6 @@ import { encryptPassword } from '@api/utils';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
   async getProfile(payload: TProfileRequest): Promise<TProfileResponse> {
-    console.log(payload);
     const user = await this.prisma.users.findUnique({
       where: {
         email: payload.email,

@@ -3,6 +3,7 @@ import {
   BadRequestException,
   ConflictException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '@api/services';
 import { comparePassword, encryptPassword } from '@api/utils';
@@ -79,7 +80,7 @@ export class AuthService {
       role: isUserExist.role?.name,
     });
     if (!isPasswordMatch) {
-      throw new BadRequestException('Password is wrong');
+      throw new UnauthorizedException('Password is wrong');
     }
     const expiresIn = 15 * 60 * 1000;
     const now = Date.now();
