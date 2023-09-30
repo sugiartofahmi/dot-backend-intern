@@ -44,8 +44,10 @@ export class UserController {
   }
   @Patch(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
-  @UsePipes(new ZodValidationPipe(VSUpdateUser))
-  async updateUserById(@Param('id') id: string, @Body() data: UpdateUserDto) {
+  async updateUserById(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(VSUpdateUser)) data: UpdateUserDto,
+  ) {
     return await this.userService.updateUserById({ id, data });
   }
   @Delete(':id')

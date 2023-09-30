@@ -52,11 +52,10 @@ export class BookController {
   }
   @Patch(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
-  @UsePipes(new ZodValidationPipe(VSUpdateBook))
   async updateBook(
     @Param('id') id: string,
     @Request() { user: { sub } }: TReqToken,
-    @Body() payload: UpdateBookDto,
+    @Body(new ZodValidationPipe(VSUpdateBook)) payload: UpdateBookDto,
   ) {
     return await this.bookService.updateBook({
       id,

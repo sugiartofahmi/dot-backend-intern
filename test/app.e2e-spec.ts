@@ -23,7 +23,7 @@ describe('E2E Testing', () => {
     it('authenticates user with valid credentials and provides a jwt token', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/login')
-        .send({ email: 'sugiartofahmi@gmail.com', password: 'Gegebanget1' })
+        .send({ email: 'testadmin@gmail.com', password: 'Gegebanget1' })
         .expect(201);
 
       access_token = response.body.access_token;
@@ -36,7 +36,7 @@ describe('E2E Testing', () => {
     it('fails to authenticate user with an incorrect password', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/login')
-        .send({ email: 'sugiartofahmi@gmail.com', password: 'Gegebaget1' })
+        .send({ email: 'testadmin@gmail.com', password: 'Gegebaget1' })
         .expect(401);
 
       expect(response.body.access_token).not.toBeDefined();
@@ -54,7 +54,10 @@ describe('E2E Testing', () => {
     it('Get data user failed', async () => {
       const response = await request(app.getHttpServer())
         .get('/user/me')
-        .auth('444k', { type: 'bearer' })
+        .auth(
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC9.eyJdWIiOiIzNGY5ZmYwZC03ZDhlLTQ5ZjUtYmM0NS02NDdmOTZkMzg5NGQiLCJlbWFpbCI6ImZhaG1pQGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNjk2MDg4Njc0LCJleHAiOjE2OTYwODk1NzR.KzcCLyzknH5EuOFL2JpllyPEbm7zjMzBNzl8eZIaisg',
+          { type: 'bearer' },
+        )
         .send();
 
       expect(response.status).toBe(401);
@@ -73,7 +76,7 @@ describe('E2E Testing', () => {
       const loginResponse = await request(app.getHttpServer())
         .post('/auth/login')
         .send({
-          email: 'sugiartofahmi24@gmail.com',
+          email: 'testuser@gmail.com',
           password: 'Gegebanget1',
         });
       const response = await request(app.getHttpServer())
