@@ -26,7 +26,7 @@ import { ZodValidationPipe } from '@api/pipes';
 export class BookController {
   constructor(private readonly bookService: BookService) {}
   @Get()
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN]))
+  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
   async getAllBooks(@Request() { user: { sub, role } }: TReqToken) {
     return await this.bookService.getAllBooks({ author_id: sub, role });
   }
@@ -45,7 +45,10 @@ export class BookController {
     @Body() payload: CreateBookDto,
     @Request() { user: { sub } }: TReqToken,
   ) {
-    return await this.bookService.createBook({ ...payload, author_id: sub });
+    return await this.bookService.createBook({
+      title: payload.title,
+      author_id: sub,
+    });
   }
   @Patch(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))

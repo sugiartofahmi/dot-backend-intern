@@ -1,9 +1,20 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "rootDir": "../",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "@api/modules": "<rootDir>/src/modules$1",
+    "^@api/services": "<rootDir>/src/services$1",
+    "^@api/controllers": "<rootDir>/src/controllers$1",
+    "^@api/entities": "<rootDir>/src/entities$1",
+    "^@api/utils": "<rootDir>/src/utils$1",
+    "^@api/pipes": "<rootDir>/src/pipes$1",
+    "^@api/guards": "<rootDir>/src/guards$1",
+    "^@api/strategies": "<rootDir>/src/strategies$1",
+    "^@api/models": "<rootDir>/src/models$1"
   }
 }

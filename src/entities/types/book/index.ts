@@ -26,6 +26,7 @@ export type TBooksRequest = {
 };
 
 export type TBooksResponse = {
+  id: string;
   title: string;
   created_at: Date;
   author: {
