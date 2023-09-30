@@ -19,7 +19,7 @@ export class BookService {
   constructor(private readonly prisma: PrismaService) {}
   async getBookById(payload: TBookByIdRequest): Promise<TBookResponse> {
     const book = await this.prisma.books.findUnique({
-      where: { id: payload.id, author_id: payload.author_id },
+      where: { id: payload.id },
       select: {
         id: true,
         title: true,
