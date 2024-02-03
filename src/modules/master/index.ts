@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '../auth';
-import { UserModule } from '../user';
-import { BookModule } from '../book';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy, RtStrategy } from '@api/strategies';
+import { AuthModule } from '../auth';
 import { DrizzleModule } from '../drizzle';
+import { ProductModule } from '../product';
+import { CategoryModule } from '../category';
 @Module({
   imports: [
     AuthModule,
-    UserModule,
-    BookModule,
+    ProductModule,
+    CategoryModule,
     DrizzleModule,
     PassportModule.register({
       defaultStrategy: 'jwt',

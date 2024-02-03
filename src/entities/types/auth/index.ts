@@ -1,16 +1,15 @@
 import { users } from '@api/models';
-import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
+import { InferInsertModel } from 'drizzle-orm';
 
-export type TRegisterRequest = InferInsertModel<typeof users>;
+export type TUser = InferInsertModel<typeof users>;
+
+export type TRegisterRequest = TUser;
 
 export type TRegisterResponse = {
   message: string;
 };
 
-export type TLoginRequest = Pick<
-  InferSelectModel<typeof users>,
-  'email' | 'password'
->;
+export type TLoginRequest = Pick<TUser, 'email' | 'password'>;
 
 export type TLoginResponse = {
   accessToken: string;
