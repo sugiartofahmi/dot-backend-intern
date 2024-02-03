@@ -73,7 +73,7 @@ export class AuthService {
       password,
       isUserExist.password,
     );
-    const { access_token, refresh_token } = await generateToken({
+    const { accessToken, refreshToken } = await generateToken({
       sub: isUserExist.id,
       email: isUserExist.email,
     });
@@ -85,21 +85,21 @@ export class AuthService {
     const expirationTime = now + expiresIn;
 
     return {
-      expired_at: expirationTime,
-      access_token,
-      refresh_token,
+      expiredAt: expirationTime,
+      accessToken,
+      refreshToken,
     };
   }
   async refresh(payload: TTokenRequest): Promise<TRefreshToken> {
     const expiresIn = 15 * 60 * 1000;
-    const access_token = await generateAccessToken(payload);
+    const accessToken = await generateAccessToken(payload);
 
     const now = Date.now();
     const expirationTime = now + expiresIn;
 
     return {
-      access_token,
-      expired_at: expirationTime,
+      accessToken,
+      expiredAt: expirationTime,
     };
   }
 }

@@ -1,35 +1,29 @@
 export type TBookResponse = {
   title?: string;
   author?: string | null;
-  created_at?: Date;
+  createdAt?: Date;
   message?: string;
 };
 
 export type TBookByIdRequest = {
   id?: string;
-  author_id?: string;
 };
 
 export type TBookUpdateRequest = {
   id?: string;
   title?: string;
-  author_id: string;
+  authorId: string;
 };
 
 export type TBookCreateRequest = {
   title: string;
-  author_id: string;
-};
-
-export type TBooksRequest = {
-  author_id: string;
-  role: string;
+  authorId: string;
 };
 
 export type TBooksResponse = {
   id: string;
   title: string;
-  created_at: Date;
+  createdAt: Date;
   author: string | null;
 };
 

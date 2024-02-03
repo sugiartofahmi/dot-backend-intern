@@ -27,8 +27,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('me')
-  async getProfile(@Request() { user: { email } }: TReqToken) {
-    return await this.userService.getProfile({ email });
+  async getProfile(@Request() { user: { sub: id } }: TReqToken) {
+    return await this.userService.getProfile({ id });
   }
   @Get()
   async getAllUsers() {

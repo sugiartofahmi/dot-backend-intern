@@ -26,7 +26,7 @@ export const generateToken = async (
   ]);
 
   return {
-    access_token: String(access_token),
-    refresh_token: String(refresh_token),
+    accessToken: String(access_token),
+    refreshToken: String(refresh_token),
   };
 };
