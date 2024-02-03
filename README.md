@@ -4,8 +4,9 @@ Patern project yang biasa saya gunakan adalah MVC. MVC merupakan sebuah pola dal
 
 Kenapa menggunakan patern project tersebut ?
 
-- Karena dibagi mejadi 3 bagian, sehingga memudahkan saya dalam pengembangan aplikasi, testing, debuging maupun improvement
-- Reuseable, dengan MVC kita bisa menggunakan kembali service yang telah dibuat
+- Karena dibagi mejadi 3 bagian, sehingga memudahkan dalam pengembangan aplikasi, testing, debuging maupun improvement
+- Menghasilkan code yang lebih terstruktur dan terorganisir, sehingga mudah untuk dipahami, diubah, dan diperbarui.
+- Memungkinkan melakukan pengujian yang lebih mudah dan terisolasi, sehingga dapat menemukan dan memperbaiki bug dengan lebih cepat.
 
 ## Installation
 
