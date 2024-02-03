@@ -12,13 +12,17 @@ import {
 import { BookService } from '@api/services';
 import { JwtAuthGuard } from '@api/guards';
 import {
+  CreateBookDto,
   TBookCreateRequest,
   TBookUpdateRequest,
+  UpdateBookDto,
   VSCreateBook,
   VSUpdateBook,
 } from '@api/entities';
 import { ZodValidationPipe } from '@api/pipes';
-
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+@ApiTags('Book')
+@ApiBearerAuth()
 @Controller('book')
 @UseGuards(JwtAuthGuard)
 export class BookController {
@@ -31,11 +35,15 @@ export class BookController {
   async getBookById(@Param('id') id: string) {
     return await this.bookService.getBookById({ id });
   }
+
+  @ApiBody({ type: CreateBookDto })
   @Post()
   @UsePipes(new ZodValidationPipe(VSCreateBook))
   async createBook(@Body() payload: TBookCreateRequest) {
     return await this.bookService.createBook(payload);
   }
+
+  @ApiBody({ type: UpdateBookDto })
   @Patch(':id')
   async updateBook(
     @Param('id') id: string,

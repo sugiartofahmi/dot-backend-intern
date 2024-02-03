@@ -13,14 +13,18 @@ import {
 import { UserService } from '@api/services';
 import { JwtAuthGuard } from '@api/guards';
 import {
+  CreateUserDto,
   TReqToken,
   TUserByIdRequest,
   TUserUpdateRequest,
+  UpdateUserDto,
   VSCreateUser,
   VSUpdateUser,
 } from '@api/entities';
 import { ZodValidationPipe } from '@api/pipes';
-
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+@ApiTags('User')
+@ApiBearerAuth()
 @Controller('user')
 @UseGuards(JwtAuthGuard)
 export class UserController {
@@ -38,6 +42,8 @@ export class UserController {
   async getUserById(@Param() payload: TUserByIdRequest) {
     return await this.userService.getUserById(payload);
   }
+
+  @ApiBody({ type: UpdateUserDto })
   @Patch(':id')
   async updateUserById(
     @Param('id') id: string,
@@ -49,6 +55,8 @@ export class UserController {
   async deleteUserById(@Param('id') id: string) {
     return await this.userService.deleteUserById({ id });
   }
+
+  @ApiBody({ type: CreateUserDto })
   @Post()
   @UsePipes(new ZodValidationPipe(VSCreateUser))
   async createUser(@Body() payload: TUserUpdateRequest) {
