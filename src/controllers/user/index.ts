@@ -11,54 +11,47 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { UserService } from '@api/services';
-import { JwtAuthGuard, PermissionGuard } from '@api/guards';
+import { JwtAuthGuard } from '@api/guards';
 import {
   TReqToken,
   TUserByIdRequest,
+  TUserUpdateRequest,
   VSCreateUser,
-  CreateUserDto,
   VSUpdateUser,
-  UpdateUserDto,
-  ERole,
 } from '@api/entities';
 import { ZodValidationPipe } from '@api/pipes';
 
 @Controller('user')
+@UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('me')
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
   async getProfile(@Request() { user: { email } }: TReqToken) {
     return await this.userService.getProfile({ email });
   }
   @Get()
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN]))
   async getAllUsers() {
     return await this.userService.getAllUsers();
   }
   @Get(':id')
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
   async getUserById(@Param() payload: TUserByIdRequest) {
     return await this.userService.getUserById(payload);
   }
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
   async updateUserById(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(VSUpdateUser)) data: UpdateUserDto,
+    @Body(new ZodValidationPipe(VSUpdateUser)) data: TUserUpdateRequest,
   ) {
-    return await this.userService.updateUserById({ id, data });
+    return await this.userService.updateUserById({ id, ...data });
   }
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
   async deleteUserById(@Param('id') id: string) {
     return await this.userService.deleteUserById({ id });
   }
-  @Post('create')
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
+  @Post()
   @UsePipes(new ZodValidationPipe(VSCreateUser))
-  async createUser(@Body() payload: CreateUserDto) {
+  async createUser(@Body() payload: TUserUpdateRequest) {
     return await this.userService.createUser(payload);
   }
 }

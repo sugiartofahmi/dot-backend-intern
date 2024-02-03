@@ -63,28 +63,4 @@ describe('E2E Testing', () => {
       expect(response.status).toBe(401);
     });
   });
-  describe('PermissionGuard', () => {
-    it('PermissionGuard success', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/user')
-        .auth(access_token, { type: 'bearer' })
-        .send();
-
-      expect(response.status).toBe(200);
-    });
-    it('PermissionGuard failed', async () => {
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: 'testuser@gmail.com',
-          password: 'Gegebanget1',
-        });
-      const response = await request(app.getHttpServer())
-        .get('/user')
-        .auth(loginResponse.body.access_token, { type: 'bearer' })
-        .send();
-
-      expect(response.status).toBe(403);
-    });
-  });
 });

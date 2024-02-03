@@ -4,8 +4,11 @@ import {
   ConflictException,
   NotFoundException,
   UnauthorizedException,
+  Inject,
 } from '@nestjs/common';
-import { PrismaService } from '@api/services';
+import * as schema from '@api/models';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { ilike } from 'drizzle-orm';
 import { comparePassword, encryptPassword } from '@api/utils';
 import {
   TLoginRequest,
@@ -19,54 +22,50 @@ import { generateToken, generateAccessToken } from '@api/utils';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject('drizzle') private drizzle: NodePgDatabase<typeof schema>,
+  ) {}
   async register(payload: TRegisterRequest): Promise<TRegisterResponse> {
     const { email, password, fullname } = payload;
 
-    const isUserExist = await this.prisma.users.findUnique({
-      where: {
-        email,
-      },
-    });
+    const isUserExist = await this.drizzle
+      .select()
+      .from(schema.users)
+      .where(ilike(schema.users.email, email))
+      .then((res) => res.at(0));
+
     if (isUserExist) {
-      throw new ConflictException('User already exists');
+      throw new ConflictException('Email sudah digunakan');
     }
 
     const hashPassword = await encryptPassword(password);
-    const createUser = await this.prisma.users.create({
-      data: {
-        email,
-        password: hashPassword,
-        fullname,
-      },
+
+    const createUser = await this.drizzle.insert(schema.users).values({
+      email,
+      fullname,
+      password: hashPassword,
     });
     if (!createUser) {
-      throw new BadRequestException('Register failed');
+      throw new BadRequestException('Gagal membuat akun');
     }
 
     return {
-      message: `Account has been created`,
+      message: `Akun berhasil dibuat`,
     };
   }
   async login(payload: TLoginRequest): Promise<TLoginResponse> {
     const { email, password } = payload;
 
-    const isUserExist = await this.prisma.users.findUnique({
-      where: {
-        email,
-      },
-      select: {
-        id: true,
-        email: true,
-        password: true,
-        role: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
+    const isUserExist = await this.drizzle
+      .select({
+        id: schema.users.id,
+        fullname: schema.users.fullname,
+        password: schema.users.password,
+        email: schema.users.email,
+      })
+      .from(schema.users)
+      .where(ilike(schema.users.email, email))
+      .then((res) => res.at(0));
     if (!isUserExist) {
       throw new NotFoundException('User not found');
     }
@@ -77,7 +76,6 @@ export class AuthService {
     const { access_token, refresh_token } = await generateToken({
       sub: isUserExist.id,
       email: isUserExist.email,
-      role: isUserExist.role?.name,
     });
     if (!isPasswordMatch) {
       throw new UnauthorizedException('Password is wrong');

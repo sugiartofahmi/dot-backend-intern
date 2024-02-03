@@ -11,27 +11,25 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { BookService } from '@api/services';
-import { JwtAuthGuard, PermissionGuard } from '@api/guards';
+import { JwtAuthGuard } from '@api/guards';
 import {
+  TBookCreateRequest,
+  TBookUpdateRequest,
   TReqToken,
   VSCreateBook,
-  CreateBookDto,
   VSUpdateBook,
-  UpdateBookDto,
-  ERole,
 } from '@api/entities';
 import { ZodValidationPipe } from '@api/pipes';
 
 @Controller('book')
+@UseGuards(JwtAuthGuard)
 export class BookController {
   constructor(private readonly bookService: BookService) {}
   @Get()
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
-  async getAllBooks(@Request() { user: { sub, role } }: TReqToken) {
-    return await this.bookService.getAllBooks({ author_id: sub, role });
+  async getAllBooks() {
+    return await this.bookService.getAllBooks();
   }
   @Get(':id')
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
   async getBookById(
     @Param('id') id: string,
     @Request() { user: { sub } }: TReqToken,
@@ -39,10 +37,9 @@ export class BookController {
     return await this.bookService.getBookById({ id, author_id: sub });
   }
   @Post()
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
   @UsePipes(new ZodValidationPipe(VSCreateBook))
   async createBook(
-    @Body() payload: CreateBookDto,
+    @Body() payload: TBookCreateRequest,
     @Request() { user: { sub } }: TReqToken,
   ) {
     return await this.bookService.createBook({
@@ -51,24 +48,17 @@ export class BookController {
     });
   }
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
   async updateBook(
     @Param('id') id: string,
-    @Request() { user: { sub } }: TReqToken,
-    @Body(new ZodValidationPipe(VSUpdateBook)) payload: UpdateBookDto,
+    @Body(new ZodValidationPipe(VSUpdateBook)) payload: TBookUpdateRequest,
   ) {
     return await this.bookService.updateBook({
       id,
-      title: payload.title,
-      author_id: sub,
+      ...payload,
     });
   }
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, PermissionGuard([ERole.ADMIN, ERole.USER]))
-  async deleteBook(
-    @Param('id') id: string,
-    @Request() { user: { sub } }: TReqToken,
-  ) {
-    return await this.bookService.deleteBook({ id, author_id: sub });
+  async deleteBook(@Param('id') id: string) {
+    return await this.bookService.deleteBook({ id });
   }
 }

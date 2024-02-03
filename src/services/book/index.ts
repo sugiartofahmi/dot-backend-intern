@@ -1,9 +1,12 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '@api/services';
+import * as schema from '@api/models';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { eq } from 'drizzle-orm';
 import {
   TBookResponse,
   TBookByIdRequest,
@@ -11,127 +14,90 @@ import {
   TBooksResponse,
   TBookCreateResponse,
   TBookUpdateRequest,
-  TBooksRequest,
 } from '@api/entities';
 
 @Injectable()
 export class BookService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject('drizzle') private drizzle: NodePgDatabase<typeof schema>,
+  ) {}
   async getBookById(payload: TBookByIdRequest): Promise<TBookResponse> {
-    const book = await this.prisma.books.findUnique({
-      where: { id: payload.id },
-      select: {
-        id: true,
-        title: true,
-        created_at: true,
-        author: {
-          select: {
-            fullname: true,
-          },
-        },
-      },
-    });
+    const book = await this.drizzle
+      .select({
+        id: schema.books.id,
+        title: schema.books.title,
+        createdAt: schema.books.createdAt,
+        author: schema.users.fullname,
+      })
+      .from(schema.books)
+      .leftJoin(schema.users, eq(schema.users.id, schema.books.authorId))
+      .where(eq(schema.books.id, payload.id as string))
+      .then((res) => res.at(0));
+
     if (!book) {
-      throw new NotFoundException('Book not found');
+      throw new NotFoundException('Buku tidak ditemukan');
     }
     return {
       title: book.title,
-      created_at: book.created_at,
-      author: book.author.fullname,
+      created_at: book.createdAt,
+      author: book.author,
     };
   }
-  async getAllBooks({
-    author_id,
-    role,
-  }: TBooksRequest): Promise<TBooksResponse[]> {
-    const books = await this.prisma.books.findMany({
-      where: {
-        ...(role === 'user' && {
-          author_id,
-        }),
-      },
-      select: {
-        id: true,
-        title: true,
-        created_at: true,
-        author: {
-          select: {
-            fullname: true,
-          },
-        },
-      },
-    });
+  async getAllBooks(): Promise<TBooksResponse[]> {
+    const books = await this.drizzle
+      .select({
+        id: schema.books.id,
+        title: schema.books.title,
+        created_at: schema.books.createdAt,
+        author: schema.users.fullname,
+      })
+      .from(schema.books)
+      .leftJoin(schema.users, eq(schema.users.id, schema.books.authorId));
+
     if (!books) {
-      throw new NotFoundException('Books not found');
+      throw new NotFoundException('Buku tidak tersedia');
     }
     return books;
   }
 
   async createBook(payload: TBookCreateRequest): Promise<TBookCreateResponse> {
-    const book = await this.prisma.users.update({
-      where: {
-        id: payload.author_id,
-      },
-      data: {
-        books: {
-          create: {
-            title: payload.title,
-          },
-        },
-      },
+    const book = await this.drizzle.insert(schema.books).values({
+      title: payload.title,
+      authorId: payload.author_id,
     });
     if (!book) {
-      throw new BadRequestException('Book not created');
+      throw new BadRequestException('Gagal menambahkan buku');
     }
     return {
-      message: 'Book created',
+      message: 'Buku berhasil dibuat',
     };
   }
   async updateBook(payload: TBookUpdateRequest): Promise<TBookResponse> {
-    const book = await this.prisma.books.update({
-      where: { id: payload.id },
-      data: payload,
-      select: {
-        id: true,
-        title: true,
-        created_at: true,
-        author: {
-          select: {
-            fullname: true,
-          },
-        },
-      },
-    });
+    const book = await this.drizzle
+      .update(schema.books)
+      .set({
+        title: payload.title,
+        authorId: payload.author_id,
+      })
+      .where(eq(schema.books.id, payload.id as string));
+
     if (!book) {
-      throw new BadRequestException('Book not updated');
+      throw new BadRequestException('Gagal update buku');
     }
     return {
-      title: book.title,
-      created_at: book.created_at,
-      author: book.author.fullname,
+      message: 'Berhasil update buku',
     };
   }
   async deleteBook(payload: TBookByIdRequest): Promise<TBookResponse> {
-    const book = await this.prisma.books.delete({
-      where: { id: payload.id },
-      select: {
-        id: true,
-        title: true,
-        created_at: true,
-        author: {
-          select: {
-            fullname: true,
-          },
-        },
-      },
-    });
+    const book = await this.drizzle
+      .delete(schema.books)
+      .where(eq(schema.books.id, payload.id as string));
+
     if (!book) {
-      throw new NotFoundException('Book not deleted');
+      throw new NotFoundException('Gagal menghapus buku');
     }
     return {
-      title: book.title,
-      created_at: book.created_at,
-      author: book.author.fullname,
+      message: 'Buku berhasil dihapus',
     };
   }
 }

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from '@api/services';
 import { AuthController } from '@api/controllers';
-import { PrismaModule } from '../prisma';
+import { DrizzleModule } from '../drizzle';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    PrismaModule,
+    DrizzleModule,
     JwtModule.register({
       global: true,
       secret: process.env.ACCESS_SECRET,

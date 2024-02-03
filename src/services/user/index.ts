@@ -1,10 +1,13 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '@api/services';
+import * as schema from '@api/models';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { eq, ilike } from 'drizzle-orm';
 import {
   TProfileRequest,
   TProfileResponse,
@@ -17,111 +20,108 @@ import { encryptPassword } from '@api/utils';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject('drizzle') private drizzle: NodePgDatabase<typeof schema>,
+  ) {}
   async getProfile(payload: TProfileRequest): Promise<TProfileResponse> {
-    const user = await this.prisma.users.findUnique({
-      where: {
-        email: payload.email,
-      },
-      select: {
-        email: true,
-        fullname: true,
-        id: true,
-      },
-    });
+    const user = await this.drizzle
+      .select({
+        id: schema.users.id,
+        email: schema.users.email,
+        fullname: schema.users.fullname,
+      })
+      .from(schema.users)
+      .where(ilike(schema.users.email, payload.email))
+      .then((res) => res.at(0));
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Akun tidak ditemukan');
     }
     return user;
   }
   async getAllUsers(): Promise<TUsersResponse> {
-    const users = await this.prisma.users.findMany({
-      select: {
-        id: true,
-        email: true,
-        fullname: true,
-        password: true,
-        role: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
+    const users = await this.drizzle
+      .select({
+        id: schema.users.id,
+        email: schema.users.email,
+        fullname: schema.users.fullname,
+      })
+      .from(schema.users);
+
     if (!users) {
-      throw new NotFoundException('Users not found');
+      throw new NotFoundException('Akun tidak tersedia');
     }
     return users;
   }
   async getUserById(payload: TUserByIdRequest): Promise<TUserByIdResponse> {
-    const user = await this.prisma.users.findUnique({
-      where: {
-        id: payload.id,
-      },
-      select: {
-        email: true,
-        fullname: true,
-        id: true,
-        role: true,
-        books: true,
-      },
-    });
+    const user = await this.drizzle
+      .select({
+        id: schema.users.id,
+        email: schema.users.email,
+        fullname: schema.users.fullname,
+      })
+      .from(schema.users)
+      .where(eq(schema.users.id, payload.id))
+      .then((res) => res.at(0));
     if (!user) {
-      throw new NotFoundException('Users not found');
+      throw new NotFoundException('Akun tidak ditemukan');
     }
     return user;
   }
   async updateUserById(payload: TUserUpdateRequest) {
-    const user = await this.prisma.users.update({
-      where: {
-        id: payload.id,
-      },
-      data: payload.data,
-    });
+    const { id, ...data } = payload;
+    const user = await this.drizzle
+      .update(schema.users)
+      .set({
+        ...data,
+      })
+      .where(eq(schema.users.id, id as string))
+      .returning({
+        id: schema.users.id,
+        email: schema.users.email,
+        fullname: schema.users.fullname,
+      });
     if (!user) {
-      throw new NotFoundException('Users not found');
+      throw new NotFoundException('Akun tidak ditemukan');
     }
     return user;
   }
-  async deleteUserById(payload: TUserByIdRequest): Promise<TUserByIdResponse> {
-    const user = await this.prisma.users.delete({
-      where: {
-        id: payload.id,
-      },
-    });
+  async deleteUserById(payload: TUserByIdRequest) {
+    const user = await this.drizzle
+      .delete(schema.users)
+      .where(eq(schema.users.id, payload.id));
     if (!user) {
-      throw new NotFoundException('Users not found');
+      throw new NotFoundException('Akun tidak ditemukan');
     }
-    return user;
+    return {
+      message: 'Berhasil menghapus akun',
+    };
   }
-  async createUser(payload) {
-    const { email, password, fullname, role_id } = payload;
+  async createUser(payload: TUserUpdateRequest) {
+    const { email, password, fullname } = payload;
 
-    const isUserExist = await this.prisma.users.findUnique({
-      where: {
-        email,
-      },
-    });
+    const isUserExist = await this.drizzle
+      .select()
+      .from(schema.users)
+      .where(ilike(schema.users.email, email))
+      .then((res) => res.at(0));
+
     if (isUserExist) {
-      throw new ConflictException('User already exists');
+      throw new ConflictException('Akun sudah tersedia');
     }
 
     const hashPassword = await encryptPassword(password);
-    const createUser = await this.prisma.users.create({
-      data: {
-        email,
-        password: hashPassword,
-        fullname,
-        role_id,
-      },
+
+    const createUser = await this.drizzle.insert(schema.users).values({
+      email,
+      fullname,
+      password: hashPassword,
     });
     if (!createUser) {
-      throw new BadRequestException('Create user failed');
+      throw new BadRequestException('Gagal membuat akun');
     }
 
     return {
-      message: `Account has been created`,
+      message: `Akun berhasil dibuat`,
     };
   }
 }

@@ -10,10 +10,10 @@ import { AuthService } from '@api/services';
 import { ZodValidationPipe } from '@api/pipes';
 import {
   VSRegister,
-  RegisterDto,
-  LoginDto,
   VSLogin,
   TReqToken,
+  TRegisterRequest,
+  TLoginRequest,
 } from '@api/entities';
 import { RtGuard } from '@api/guards';
 
@@ -23,19 +23,19 @@ export class AuthController {
 
   @Post('register')
   @UsePipes(new ZodValidationPipe(VSRegister))
-  async register(@Body() payload: RegisterDto) {
+  async register(@Body() payload: TRegisterRequest) {
     return await this.authService.register(payload);
   }
 
   @Post('login')
   @UsePipes(new ZodValidationPipe(VSLogin))
-  async login(@Body() payload: LoginDto) {
+  async login(@Body() payload: TLoginRequest) {
     return await this.authService.login(payload);
   }
 
   @Post('refresh')
   @UseGuards(RtGuard)
-  async refresh(@Request() { user: { email, sub, role } }: TReqToken) {
-    return await this.authService.refresh({ email, sub, role });
+  async refresh(@Request() { user: { email, sub } }: TReqToken) {
+    return await this.authService.refresh({ email, sub });
   }
 }

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { BookService } from '@api/services';
 import { BookController } from '@api/controllers';
-import { PrismaModule } from '../prisma';
+import { DrizzleModule } from '../drizzle';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [DrizzleModule],
   controllers: [BookController],
   providers: [BookService],
 })

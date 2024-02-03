@@ -23,7 +23,6 @@ export type TLoginResponse = {
 export type TTokenRequest = {
   sub: string;
   email: string;
-  role: string;
 };
 
 export type TReqToken = {
