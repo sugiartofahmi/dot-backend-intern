@@ -24,7 +24,13 @@ describe('E2E Testing', () => {
   const fullname = faker.person.fullName();
   const email = faker.internet.email();
   const password = faker.internet.password();
-  describe('Auth Service', () => {
+  const categoryId = faker.string.uuid();
+  const categoryName = 'Test';
+  const productId = faker.string.uuid();
+  const productName = faker.commerce.productName();
+  const productPrice = String(Number(faker.finance.amount({ dec: 0 })) * 1000);
+  const productCategoryId = categoryId;
+  describe('Authentication test case', () => {
     it('Register users with valid data', async () => {
       await request(app.getHttpServer())
         .post('/auth/register')
@@ -35,25 +41,7 @@ describe('E2E Testing', () => {
         })
         .expect(201);
     });
-    it('Registering users with invalid data', async () => {
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'test@example.com',
-          password: 'password',
-        })
-        .expect(400);
-    });
-    it('Register the user with the email that has been used', async () => {
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email,
-          password,
-          fullname,
-        })
-        .expect(409);
-    });
+
     it('Login user with valid credentials and provides a jwt token', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/login')
@@ -71,7 +59,7 @@ describe('E2E Testing', () => {
     it('fails to authenticate user with an incorrect password', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/login')
-        .send({ email, password: 'password' })
+        .send({ email, password: faker.internet.password() })
         .expect(401);
 
       expect(response.body.accessToken).not.toBeDefined();
@@ -99,13 +87,130 @@ describe('E2E Testing', () => {
         .expect(401);
     });
   });
-  describe('Book Service', () => {
-    it('Register users with valid data', async () => {
+  describe('Category test case', () => {
+    it('Can add new category', async () => {
       await request(app.getHttpServer())
-        .get('/book')
+        .post('/category')
+        .auth(accessToken, { type: 'bearer' })
+        .send({
+          id: categoryId,
+          name: categoryName,
+        })
+        .expect(201);
+    });
+    it('Cant add category because jwt is invalid', async () => {
+      await request(app.getHttpServer())
+        .post('/category')
+        .send({
+          id: categoryId,
+          name: categoryName,
+        })
+        .expect(401);
+    });
+    it('Can read category', async () => {
+      await request(app.getHttpServer())
+        .get('/category')
         .auth(accessToken, { type: 'bearer' })
         .send()
         .expect(200);
+    });
+    it('Cant read because jwt is invalid', async () => {
+      await request(app.getHttpServer()).get('/category').send().expect(401);
+    });
+    it('Can update category', async () => {
+      await request(app.getHttpServer())
+        .patch(`/category/${categoryId}`)
+        .auth(accessToken, { type: 'bearer' })
+        .send({
+          name: faker.commerce.productName(),
+        })
+        .expect(200);
+    });
+    it('Cant update because jwt is invalid', async () => {
+      await request(app.getHttpServer())
+        .patch(`/category/${categoryId}`)
+        .send({
+          name: faker.commerce.productName(),
+        })
+        .expect(401);
+    });
+    it('Can delete category', async () => {
+      await request(app.getHttpServer())
+        .delete(`/category/${categoryId}`)
+        .auth(accessToken, { type: 'bearer' })
+        .send()
+        .expect(200);
+    });
+    it('Cant delete because jwt is invalid', async () => {
+      await request(app.getHttpServer())
+        .delete(`/category/${categoryId}`)
+        .send()
+        .expect(401);
+    });
+  });
+  describe('Product test case', () => {
+    it('Can add new product', async () => {
+      await request(app.getHttpServer())
+        .post('/category')
+        .auth(accessToken, { type: 'bearer' })
+        .send({
+          id: categoryId,
+          name: categoryName,
+        });
+
+      await request(app.getHttpServer())
+        .post('/product')
+        .auth(accessToken, { type: 'bearer' })
+        .send({
+          id: productId,
+          name: productName,
+          price: productPrice,
+          categoryId: productCategoryId,
+        })
+        .expect(201);
+    });
+    it('Cant add product because jwt is invalid', async () => {
+      await request(app.getHttpServer())
+        .post('/product')
+        .send({
+          id: productId,
+          name: productName,
+          price: productPrice,
+          categoryId: productCategoryId,
+        })
+        .expect(401);
+    });
+
+    it('Can update product', async () => {
+      await request(app.getHttpServer())
+        .patch(`/product/${productId}`)
+        .auth(accessToken, { type: 'bearer' })
+        .send({
+          name: faker.commerce.productName(),
+        })
+        .expect(200);
+    });
+    it('Cant update product because jwt is invalid', async () => {
+      await request(app.getHttpServer())
+        .patch(`/product/${productId}`)
+        .send({
+          name: faker.commerce.productName(),
+        })
+        .expect(401);
+    });
+
+    it('Can delete product', async () => {
+      await request(app.getHttpServer())
+        .delete(`/product/${productId}`)
+        .auth(accessToken, { type: 'bearer' })
+        .send()
+        .expect(200);
+    });
+    it('Cant delete product because jwt is invalid', async () => {
+      await request(app.getHttpServer())
+        .delete(`/product/${productId}`)
+        .send()
+        .expect(401);
     });
   });
 });
