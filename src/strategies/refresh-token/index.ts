@@ -8,7 +8,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromBodyField('refresh_token'),
+      jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
       secretOrKey: process.env['REFRESH_SECRET'],
       passReqToCallback: true,
     });

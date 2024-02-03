@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { MasterModule } from '@api/modules';
+import { faker } from '@faker-js/faker';
 
 describe('E2E Testing', () => {
   let app: INestApplication;
@@ -18,17 +19,51 @@ describe('E2E Testing', () => {
   afterAll(async () => {
     await Promise.all([app.close()]);
   });
-  let access_token: string;
-  describe('AuthModule', () => {
-    it('authenticates user with valid credentials and provides a jwt token', async () => {
+  let accessToken: string;
+  let refreshToken: string;
+  const fullname = faker.person.fullName();
+  const email = faker.internet.email();
+  const password = faker.internet.password();
+  describe('Auth Service', () => {
+    it('Register users with valid data', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/register')
+        .send({
+          email,
+          password,
+          fullname,
+        })
+        .expect(201);
+    });
+    it('Registering users with invalid data', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/register')
+        .send({
+          email: 'test@example.com',
+          password: 'password',
+        })
+        .expect(400);
+    });
+    it('Register the user with the email that has been used', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/register')
+        .send({
+          email,
+          password,
+          fullname,
+        })
+        .expect(409);
+    });
+    it('Login user with valid credentials and provides a jwt token', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/login')
-        .send({ email: 'testadmin@gmail.com', password: 'Gegebanget1' })
+        .send({ email, password })
         .expect(201);
 
-      access_token = response.body.access_token;
-      expect(response.body.access_token).toBeDefined();
-      expect(access_token).toMatch(
+      accessToken = response.body.accessToken;
+      refreshToken = response.body.refreshToken;
+      expect(response.body.accessToken).toBeDefined();
+      expect(accessToken).toMatch(
         /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/,
       );
     });
@@ -36,31 +71,41 @@ describe('E2E Testing', () => {
     it('fails to authenticate user with an incorrect password', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/login')
-        .send({ email: 'testadmin@gmail.com', password: 'Gegebaget1' })
+        .send({ email, password: 'password' })
         .expect(401);
 
-      expect(response.body.access_token).not.toBeDefined();
+      expect(response.body.accessToken).not.toBeDefined();
+    });
+
+    it('Refresh token with valid jwt token', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .send({ refreshToken })
+        .expect(201);
+
+      accessToken = response.body.accessToken;
+      expect(response.body.accessToken).toBeDefined();
+      expect(accessToken).toMatch(
+        /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/,
+      );
+    });
+    it('Refresh token with invalid jwt token', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .send({
+          refreshToken:
+            'eyJhbGciOiJIUzI1NisInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNjAzYjMzMi0yODE1LTQ4NDktYmE0Ni1jYjkxMGQzYWRmZTQiLCJlbWFpbCI6InN1Z2lhcnRvZmFobWlAZ21haWwuY29tIiwiaWF0IjoxNzA2OTczNzU5LCJleHAiOjE3MDc1Nzg1NTl9.ejlUXalaU6A10HzfXHJYR0xeUAvjgtCMScvEOYsJfBg',
+        })
+        .expect(401);
     });
   });
-  describe('UserModule', () => {
-    it('Get data user success', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/user/me')
-        .auth(access_token, { type: 'bearer' })
-        .send();
-
-      expect(response.status).toBe(200);
-    });
-    it('Get data user failed', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/user/me')
-        .auth(
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC9.eyJdWIiOiIzNGY5ZmYwZC03ZDhlLTQ5ZjUtYmM0NS02NDdmOTZkMzg5NGQiLCJlbWFpbCI6ImZhaG1pQGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNjk2MDg4Njc0LCJleHAiOjE2OTYwODk1NzR.KzcCLyzknH5EuOFL2JpllyPEbm7zjMzBNzl8eZIaisg',
-          { type: 'bearer' },
-        )
-        .send();
-
-      expect(response.status).toBe(401);
+  describe('Book Service', () => {
+    it('Register users with valid data', async () => {
+      await request(app.getHttpServer())
+        .get('/book')
+        .auth(accessToken, { type: 'bearer' })
+        .send()
+        .expect(200);
     });
   });
 });
