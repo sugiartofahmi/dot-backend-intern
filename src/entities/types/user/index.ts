@@ -5,7 +5,7 @@ export type TProfileResponse = {
 };
 
 export type TProfileRequest = {
-  email: string;
+  id: string;
 };
 
 export type TUsersResponse = Array<{
@@ -22,7 +22,6 @@ export type TUserByIdResponse = TProfileResponse;
 
 export type TUserUpdateRequest = {
   id?: string | null;
-  role_id?: number;
   fullname: string;
   password: string;
   email: string;

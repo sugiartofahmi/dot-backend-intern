@@ -39,7 +39,7 @@ export class BookService {
     }
     return {
       title: book.title,
-      created_at: book.createdAt,
+      createdAt: book.createdAt,
       author: book.author,
     };
   }
@@ -48,7 +48,7 @@ export class BookService {
       .select({
         id: schema.books.id,
         title: schema.books.title,
-        created_at: schema.books.createdAt,
+        createdAt: schema.books.createdAt,
         author: schema.users.fullname,
       })
       .from(schema.books)
@@ -63,7 +63,7 @@ export class BookService {
   async createBook(payload: TBookCreateRequest): Promise<TBookCreateResponse> {
     const book = await this.drizzle.insert(schema.books).values({
       title: payload.title,
-      authorId: payload.author_id,
+      authorId: payload.authorId,
     });
     if (!book) {
       throw new BadRequestException('Gagal menambahkan buku');
@@ -77,7 +77,7 @@ export class BookService {
       .update(schema.books)
       .set({
         title: payload.title,
-        authorId: payload.author_id,
+        authorId: payload.authorId,
       })
       .where(eq(schema.books.id, payload.id as string));
 

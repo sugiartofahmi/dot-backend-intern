@@ -7,7 +7,6 @@ import {
   Delete,
   UseGuards,
   Param,
-  Request,
   UsePipes,
 } from '@nestjs/common';
 import { BookService } from '@api/services';
@@ -15,7 +14,6 @@ import { JwtAuthGuard } from '@api/guards';
 import {
   TBookCreateRequest,
   TBookUpdateRequest,
-  TReqToken,
   VSCreateBook,
   VSUpdateBook,
 } from '@api/entities';
@@ -30,22 +28,13 @@ export class BookController {
     return await this.bookService.getAllBooks();
   }
   @Get(':id')
-  async getBookById(
-    @Param('id') id: string,
-    @Request() { user: { sub } }: TReqToken,
-  ) {
-    return await this.bookService.getBookById({ id, author_id: sub });
+  async getBookById(@Param('id') id: string) {
+    return await this.bookService.getBookById({ id });
   }
   @Post()
   @UsePipes(new ZodValidationPipe(VSCreateBook))
-  async createBook(
-    @Body() payload: TBookCreateRequest,
-    @Request() { user: { sub } }: TReqToken,
-  ) {
-    return await this.bookService.createBook({
-      title: payload.title,
-      author_id: sub,
-    });
+  async createBook(@Body() payload: TBookCreateRequest) {
+    return await this.bookService.createBook(payload);
   }
   @Patch(':id')
   async updateBook(

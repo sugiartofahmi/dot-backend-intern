@@ -31,7 +31,7 @@ export class UserService {
         fullname: schema.users.fullname,
       })
       .from(schema.users)
-      .where(ilike(schema.users.email, payload.email))
+      .where(eq(schema.users.id, payload.id))
       .then((res) => res.at(0));
     if (!user) {
       throw new NotFoundException('Akun tidak ditemukan');

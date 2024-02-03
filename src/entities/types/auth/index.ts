@@ -1,23 +1,21 @@
-export type TRegisterRequest = {
-  email: string;
-  password: string;
-  fullname: string;
-  role_id?: number;
-};
+import { users } from '@api/models';
+import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
+
+export type TRegisterRequest = InferInsertModel<typeof users>;
 
 export type TRegisterResponse = {
   message: string;
 };
 
-export type TLoginRequest = {
-  email: string;
-  password: string;
-};
+export type TLoginRequest = Pick<
+  InferSelectModel<typeof users>,
+  'email' | 'password'
+>;
 
 export type TLoginResponse = {
-  access_token: string;
-  expired_at: number;
-  refresh_token: string;
+  accessToken: string;
+  expiredAt: number;
+  refreshToken: string;
 };
 
 export type TTokenRequest = {
@@ -30,11 +28,11 @@ export type TReqToken = {
 };
 
 export type TTokenResponse = {
-  access_token: string;
-  refresh_token: string;
+  accessToken: string;
+  refreshToken: string;
 };
 
 export type TRefreshToken = {
-  access_token: string;
-  expired_at: number;
+  accessToken: string;
+  expiredAt: number;
 };
