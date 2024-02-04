@@ -119,7 +119,12 @@ export class ProductService {
   async delete(id: string): Promise<TProductResponses> {
     const response = await this.drizzle
       .delete(schema.products)
-      .where(eq(schema.products.id, id));
+      .where(eq(schema.products.id, id))
+      .returning({
+        id: schema.products.id,
+        name: schema.products.name,
+      })
+      .then((res) => res.at(0));
 
     if (!response) {
       throw new NotFoundException('Gagal menghapus produk');

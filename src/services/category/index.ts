@@ -97,7 +97,12 @@ export class CategoryService {
   async delete(id: string): Promise<TCategoryResponse> {
     const response = await this.drizzle
       .delete(schema.categories)
-      .where(eq(schema.categories.id, id));
+      .where(eq(schema.categories.id, id))
+      .returning({
+        id: schema.categories.id,
+        name: schema.categories.name,
+      })
+      .then((res) => res.at(0));
 
     if (!response) {
       throw new NotFoundException('Gagal menghapus kategori');
