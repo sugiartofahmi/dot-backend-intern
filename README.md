@@ -8,6 +8,10 @@ Kenapa menggunakan patern project tersebut ?
 - Menghasilkan code yang lebih terstruktur dan terorganisir, sehingga mudah untuk dipahami, diubah, dan diperbarui.
 - Memungkinkan melakukan pengujian yang lebih mudah dan terisolasi, sehingga dapat menemukan dan memperbaiki bug dengan lebih cepat.
 
+## API Documentation
+
+https://documenter.getpostman.com/view/28846904/2s9YyvCLk1
+
 ## Installation
 
 ```bash
