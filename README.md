@@ -4,7 +4,7 @@ Patern project yang biasa saya gunakan adalah Repository. Repository pattern ada
 
 Kenapa menggunakan patern project tersebut ?
 
-- Karena business logic dengan persistence logic, sehingga memudahkan dalam pengembangan aplikasi, testing, debuging maupun improvement
+- Karena business logic dengan persistence logic terpisah, sehingga memudahkan dalam pengembangan aplikasi, testing, debuging maupun improvement
 - Menghasilkan code yang lebih terstruktur dan terorganisir, sehingga mudah untuk dipahami, diubah, dan diperbarui.
 - Memungkinkan melakukan pengujian yang lebih mudah dan terisolasi, sehingga dapat menemukan dan memperbaiki bug dengan lebih cepat.
 
