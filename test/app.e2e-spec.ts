@@ -98,7 +98,7 @@ describe('E2E Testing', () => {
         })
         .expect(201);
     });
-    it('Cant add category because jwt is invalid', async () => {
+    it('failed add category because jwt is invalid', async () => {
       await request(app.getHttpServer())
         .post('/category')
         .send({
@@ -114,7 +114,7 @@ describe('E2E Testing', () => {
         .send()
         .expect(200);
     });
-    it('Cant read because jwt is invalid', async () => {
+    it('failed read category because jwt is invalid', async () => {
       await request(app.getHttpServer()).get('/category').send().expect(401);
     });
     it('Can update category', async () => {
@@ -126,7 +126,7 @@ describe('E2E Testing', () => {
         })
         .expect(200);
     });
-    it('Cant update because jwt is invalid', async () => {
+    it('failed update because jwt is invalid', async () => {
       await request(app.getHttpServer())
         .patch(`/category/${categoryId}`)
         .send({
@@ -141,7 +141,7 @@ describe('E2E Testing', () => {
         .send()
         .expect(200);
     });
-    it('Cant delete because jwt is invalid', async () => {
+    it('failed delete category because jwt is invalid', async () => {
       await request(app.getHttpServer())
         .delete(`/category/${categoryId}`)
         .send()
@@ -169,7 +169,7 @@ describe('E2E Testing', () => {
         })
         .expect(201);
     });
-    it('Cant add product because jwt is invalid', async () => {
+    it('failed add product because jwt is invalid', async () => {
       await request(app.getHttpServer())
         .post('/product')
         .send({
@@ -180,7 +180,16 @@ describe('E2E Testing', () => {
         })
         .expect(401);
     });
-
+    it('Can read product', async () => {
+      await request(app.getHttpServer())
+        .get('/product')
+        .auth(accessToken, { type: 'bearer' })
+        .send()
+        .expect(200);
+    });
+    it('failed read product because jwt is invalid', async () => {
+      await request(app.getHttpServer()).get('/category').send().expect(401);
+    });
     it('Can update product', async () => {
       await request(app.getHttpServer())
         .patch(`/product/${productId}`)
@@ -190,7 +199,8 @@ describe('E2E Testing', () => {
         })
         .expect(200);
     });
-    it('Cant update product because jwt is invalid', async () => {
+
+    it('failed update product because jwt is invalid', async () => {
       await request(app.getHttpServer())
         .patch(`/product/${productId}`)
         .send({
@@ -206,7 +216,7 @@ describe('E2E Testing', () => {
         .send()
         .expect(200);
     });
-    it('Cant delete product because jwt is invalid', async () => {
+    it('failed delete product because jwt is invalid', async () => {
       await request(app.getHttpServer())
         .delete(`/product/${productId}`)
         .send()
