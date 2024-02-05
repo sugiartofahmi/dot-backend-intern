@@ -1,10 +1,10 @@
 # Description
 
-Patern project yang biasa saya gunakan adalah MVC. MVC merupakan sebuah pola dalam pengembangan perangkat lunak dengan cara memisahkan component menjadi tiga bagian, yaitu : Model, View dan Contoller
+Patern project yang biasa saya gunakan adalah Repository. Repository pattern adalah suatu pendekatan untuk memisahkan business logic dengan persistence logic sehingga dapat mengurangi kompleksitas dan meningkatkan usabilitas.
 
 Kenapa menggunakan patern project tersebut ?
 
-- Karena dibagi mejadi 3 bagian, sehingga memudahkan dalam pengembangan aplikasi, testing, debuging maupun improvement
+- Karena business logic dengan persistence logic, sehingga memudahkan dalam pengembangan aplikasi, testing, debuging maupun improvement
 - Menghasilkan code yang lebih terstruktur dan terorganisir, sehingga mudah untuk dipahami, diubah, dan diperbarui.
 - Memungkinkan melakukan pengujian yang lebih mudah dan terisolasi, sehingga dapat menemukan dan memperbaiki bug dengan lebih cepat.
 
